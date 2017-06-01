@@ -1,10 +1,11 @@
 #! /usr/bin/env python
 # If we don't get all of scapy, packet types are not identified and we end
 # up losing a lot of the usefulness.
-from scapy.all import *  # noqa
+import scapy.all as scapy
 from IPython import embed
 from pprint import pprint
 import requests
+#import scapy_http.http
 
 
 # TODO: Get list of IPs and mac addresses on this host
@@ -13,7 +14,7 @@ def interesting(packet):
 
 
 def get_src_mac(packet):
-    layer2 = packet.getlayer(Ether)
+    layer2 = packet.getlayer(scapy.Ether)
     if layer2:
         # If it sent something it's definitely on the network
         # It most likely exists if it's a dst too, but let's be pessimistic
@@ -27,13 +28,14 @@ def get_src_mac(packet):
 def get_vendor(mac):
     MAC_URL = 'http://macvendors.co/api/{mac}'
     result = requests.get(MAC_URL.format(mac='BC:92:6B:A0:00:01'))
+    print(result)
     return result.json()['result']['company']
 
 
 def is_multicast(packet):
-    if packet.haslayer(IP):
-        ip_version = packet.getlayer(IP).fields['version']
-        dst = packet.getlayer(IP).fields['dst']
+    if packet.haslayer(scapy.IP):
+        ip_version = packet.getlayer(scapy.IP).fields['version']
+        dst = packet.getlayer(scapy.IP).fields['dst']
 
         if ip_version == 4:
             first_octet = int(dst.split('.')[0])
@@ -50,18 +52,18 @@ def is_multicast(packet):
 # interesting (ARP, currently- but get Dot11 for SSID too?), and not storing
 # This should result in fairly static memory usage
 print('Sniffing for 30 seconds.')
-interesting_packets = sniff(
-    timeout=30,
+interesting_packets = scapy.sniff(
+    timeout=10,
     lfilter=interesting,
 )
 
 arp_packets = [
     packet for packet in interesting_packets
-    if packet.haslayer(ARP)
+    if packet.haslayer(scapy.ARP)
 ]
 arps = {}
 for arp_packet in arp_packets:
-    arp = arp_packet.getlayer(ARP)
+    arp = arp_packet.getlayer(scapy.ARP)
     arp = (arp.psrc, arp.pdst)
     count = arps.get(arp, 0)
     arps[arp] = count + 1
