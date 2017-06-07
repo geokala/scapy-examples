@@ -2,9 +2,6 @@
 # If we don't get all of scapy, packet types are not identified and we end
 # up losing a lot of the usefulness.
 import scapy.all as scapy
-from IPython import embed
-from pprint import pprint
-import requests
 import sys
 
 
@@ -110,27 +107,24 @@ def get_http_host_name(packet):
     return hostname
 
 
-listen_time = 10
-print('Sniffing for {time} seconds.'.format(time=listen_time))
-http_packets = scapy.sniff(
-    timeout=listen_time,
-    lfilter=is_http_or_https_packet,
-)
-
-visited_http = set()
-visited_https = set()
-
-for packet in http_packets:
+def get_target_host(packet):
     packet_type = is_http_or_https_packet(packet)
+    host_name = None
+
     if packet_type == 'http':
         host_name = get_http_host_name(packet)
-        if host_name:
-            visited_http.add(host_name)
     elif packet_type == 'https':
         host_name = get_https_host_name(packet)
-        if host_name:
-            visited_https.add(host_name)
 
-print('HTTP: %s' % ', '.join(visited_http))
-print('HTTPS: %s' % ', '.join(visited_https))
-embed()
+    if host_name:
+        return '{packet_type}: {host}'.format(
+            packet_type=packet_type,
+            host=host_name,
+        )
+
+if __name__ == '__main__':
+    print('Sniffing until stopped...')
+    print('Ctrl+C is your friend!')
+    scapy.sniff(
+        prn=get_target_host,
+    )
