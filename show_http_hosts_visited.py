@@ -24,7 +24,10 @@ def get_https_host_name(packet):
         raw_packet = []
     hostname = None
 
-    packet_bytes = [ord(byte) for byte in raw_packet]
+    if sys.version[0] == '3':
+        packet_bytes = [byte for byte in raw_packet]
+    else:
+        packet_bytes = [ord(byte) for byte in raw_packet]
 
     # We only currently handle TLS
     # This has first bytes:
@@ -100,7 +103,11 @@ def get_http_host_name(packet):
     # Very naive retriever
     hostname = None
     if packet.haslayer('Raw'):
-        fields = packet.getlayer('Raw').load.split('\r\n')
+        if sys.version[0] == '3':
+            raw_packet = str(packet.getlayer('Raw').load, 'ascii')
+        else:
+            raw_packet = packet.getlayer('Raw').load
+        fields = raw_packet.split('\r\n')
         for field in fields:
             if field.startswith('Host: '):
                 hostname = field[6:].strip()
