@@ -1,4 +1,11 @@
 #! /usr/bin/env python
+##############################################################################
+# Example script for sniff functionality with automatic output of packets.
+# Shows each HTTP or HTTPS (assuming SNI is used) hostname visited on the
+# local machine while it is running.
+# Note that the command specified by prn is run asynchronously so any
+# extensions will likely need to make use of locking, etc.
+##############################################################################
 # If we don't get all of scapy, packet types are not identified and we end
 # up losing a lot of the usefulness.
 import scapy.all as scapy
@@ -128,6 +135,7 @@ def get_target_host(packet):
             packet_type=packet_type,
             host=host_name,
         )
+
 
 if __name__ == '__main__':
     print('Sniffing until stopped...')
