@@ -1,0 +1,18 @@
+Text:
+packet.show
+
+PDF:
+packet.psdump(tempfile.mkdtemp())
+(clean up after)
+
+For windows:
+  start /path/to/file, shell=True
+For OSX:
+  open /path/to/file
+For linux:
+  xdg-open /path/to/file
+
+Note also:
+Allow to list layers
+Allow to filter by layers
+(get first packet in either case, just use this to demo how to cope with layers)

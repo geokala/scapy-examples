@@ -7,11 +7,13 @@ requirements = [
 ]
 if int(version[0]) == 3:
     requirements.append('scapy-python3')
+    requirements.append('pyx')  # For showing PDF packets
 else:
     requirements.append('scapy')
+    requirements.append('pyx==0.12.1')  # For showing PDF packets
 
 setup(
     name="scapy_examples",
-    version="0.1.0",
+    version="0.2.0wip",
     install_requires=requirements,
 )
