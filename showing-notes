@@ -1,5 +1,11 @@
+Summary:
+packet.summary
+
 Text:
 packet.show
+
+Command to recreate:
+packet.command
 
 PDF:
 packet.psdump(tempfile.mkdtemp())
@@ -16,3 +22,5 @@ Note also:
 Allow to list layers
 Allow to filter by layers
 (get first packet in either case, just use this to demo how to cope with layers)
+Is this the layers?
+  layer_names = [layer._name for layer in config.conf.layers if layer._name]
