@@ -26,6 +26,8 @@ def get_src_mac(packet):
 
 
 def get_vendor(mac):
+    # Site not responding
+    return 'unknown'
     MAC_URL = 'http://macvendors.co/api/{mac}'
     result = requests.get(MAC_URL.format(mac='BC:92:6B:A0:00:01'))
     print(result)
