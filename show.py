@@ -6,7 +6,6 @@ import tempfile
 import os
 import subprocess
 # TODO: pylint, import ordering
-# TODO: scapy3
 
 ether = scapy.Ether(
     src='fe:ed:ad:ea:dc:0d',
@@ -36,11 +35,9 @@ icmp = scapy.ICMP(
     ts_ori=None,
     addr_mask=None,
     seq=101,
-    nexthopmtu=None,
     ptr=None,
     unused=None,
     ts_rx=None,
-    length=None,
     chksum=49274,
     reserved=None,
     ts_tx=None,
@@ -56,13 +53,16 @@ packet = ether/ip/icmp/data
 
 
 if __name__ == '__main__':
-    # TODO: Descriptive messages
+    print('Packet details:')
     packet.show()
 
+    print('Packet summary:')
     print(packet.summary())
 
+    print('Python code to create packet:')
     print(packet.command())
 
+    print('Creating and displaying PDF dissection of packet...')
     tempdir = tempfile.mkdtemp()
     dumpfile = os.path.join(tempdir, 'pingpacket')
     packet.psdump(dumpfile)
