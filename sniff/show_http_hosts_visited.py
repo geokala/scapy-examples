@@ -1,18 +1,27 @@
 #! /usr/bin/env python
-##############################################################################
-# Example script for sniff functionality with automatic output of packets.
-# Shows each HTTP or HTTPS (assuming SNI is used) hostname visited on the
-# local machine while it is running.
-# Note that the command specified by prn is run asynchronously so any
-# extensions will likely need to make use of locking, etc.
-##############################################################################
+"""
+    Example script for sniff functionality with automatic output of packets.
+    Shows each HTTP or HTTPS (assuming SNI is used) hostname visited on the
+    local machine while it is running.
+    Note that the command specified by prn is run asynchronously so any
+    extensions will likely need to make use of locking, etc.
+"""
+from __future__ import print_function
+import sys
+
 # If we don't get all of scapy, packet types are not identified and we end
 # up losing a lot of the usefulness.
 import scapy.all as scapy
-import sys
 
 
 def is_http_or_https_packet(packet):
+    """
+        Determine whether a scapy packet is probably HTTP/S.
+        We do this by checking whether it is going to port 80 or 443.
+
+        Returns 'http', 'https' if the packet is one of those,
+        otherwise returns False.
+    """
     if hasattr(packet, 'dport'):
         # We only need to care about the requests' host header, so we can
         # ignore packet.sport since we don't need server replies.
@@ -24,6 +33,15 @@ def is_http_or_https_packet(packet):
 
 
 def get_https_host_name(packet):
+    """
+        Get the host name that an HTTPS negotiation is intending to use.
+        This will not succeed if SNI is not in use (in which case the host
+        name will not be retrievable without breaking the encryption).
+
+        This may fail with fragmented packets.
+
+        Returns the host name as a string, or None.
+    """
     raw_packet = packet.getlayer('Raw')
     if raw_packet:
         raw_packet = raw_packet.load
@@ -74,7 +92,7 @@ def get_https_host_name(packet):
             # and the length is bound within the python array anyway.
             packet_bytes = packet_bytes[2:]
 
-            while len(packet_bytes) > 0:
+            while packet_bytes:
                 # Each extension starts with its type
                 # SNI (server name identification) is 0x00, 0x00
                 if packet_bytes[:2] == [0x00, 0x00]:
@@ -83,7 +101,9 @@ def get_https_host_name(packet):
                     packet_bytes = packet_bytes[4:]
 
                     # The next two bytes are the SNI list length
-                    # TODO: Be less naive in dealing with this
+                    # Possible exception on fragmented packets here.
+                    # Not dealt with as this is intended as simple-ish example
+                    # code.
                     packet_bytes = packet_bytes[2:]
                     if packet_bytes[0] == 0x00:
                         # This is a hostname, good!
@@ -107,6 +127,15 @@ def get_https_host_name(packet):
 
 
 def get_http_host_name(packet):
+    """
+        Get the host name of an HTTP request.
+
+        This looks for the host header.
+        It may not cope well with fragmentation, depending on where this
+        occurs.
+
+        Returns the hostname as a string, or None.
+    """
     # Very naive retriever
     hostname = None
     if packet.haslayer('Raw'):
@@ -122,7 +151,15 @@ def get_http_host_name(packet):
 
 
 def get_target_host(packet):
+    """
+        Given a packet, try to get the target HTTP/S host.
+
+        Returns a string with "{packet_type}: {host}", where packet_type is
+        either http or https and the host is the host name; or None if the
+        packet type is not correct or a hostname is not found.
+    """
     packet_type = is_http_or_https_packet(packet)
+    result = None
     host_name = None
 
     if packet_type == 'http':
@@ -131,11 +168,12 @@ def get_target_host(packet):
         host_name = get_https_host_name(packet)
 
     if host_name:
-        return '{packet_type}: {host}'.format(
+        result = '{packet_type}: {host}'.format(
             packet_type=packet_type,
             host=host_name,
         )
 
+    return result
 
 if __name__ == '__main__':
     print('Sniffing until stopped...')
