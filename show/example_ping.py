@@ -5,8 +5,10 @@
     Example of various ways to display a packet in scapy.
 """
 from __future__ import print_function
+
 import os
 import subprocess
+from sys import platform
 import tempfile
 
 # If we don't get all of scapy, packet types are not identified and we end
@@ -85,8 +87,15 @@ def display(packet):
     # This actually dumps with an eps extension
     dumpfile = dumpfile + '.eps'
 
-    # TODO: Detect OS, use appropriate opening approach
-    subprocess.check_call(['xdg-open', dumpfile])
+    if 'linux' in platform:
+        subprocess.check_call(['xdg-open', dumpfile])
+    elif platform == 'darwin':
+        subprocess.check_call(['open', dumpfile])
+    elif platform == 'win32':
+        subprocess.check_call(
+            'start {dumpfile}'.format(dumpfile=dumpfile),
+            shell=True,
+        )
 
     os.unlink(dumpfile)
     os.rmdir(tempdir)
