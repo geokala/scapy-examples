@@ -1,2 +1,3 @@
+0.3.0 - Allow showing specific layers.
 0.2.0 - Show example generating PDF and text output of packet.
 0.1.0 - Sniffing example showing all HTTP/S sites visited on local machine.

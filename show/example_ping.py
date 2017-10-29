@@ -9,7 +9,7 @@ from __future__ import print_function
 import argparse
 import os
 import subprocess
-from sys import platform, stderr, exit
+from sys import platform
 import tempfile
 
 # If we don't get all of scapy, packet types are not identified and we end
@@ -68,21 +68,40 @@ def make_packet():
     return packet
 
 
-def display(packet, filters=None):
+def display(packet, filters=None, layer=None):
     """
         Display a packet in various ways.
     """
     if filters is None:
         filters = DISPLAYS.keys()
 
+    if layer:
+        # Get just this layer otherwise the layer and all contained
+        # layers will be displayed
+        displayed = packet.getlayer(layer).copy()
+        displayed.remove_payload()
+        message = 'Layer {layer} {selection}:'
+    else:
+        displayed = packet
+        message = 'Packet {selection}:'
+
     for selected in filters:
         if selected in DISPLAYS:
-            print('Packet {sel}:'.format(
-                sel=selected.replace('_', ' '),
+            print(message.format(
+                selection=selected.replace('_', ' '),
+                layer=layer,
             ))
-            DISPLAYS[selected](packet)
+            DISPLAYS[selected](displayed)
+            print('')
         else:
             invalid(selected)
+
+
+def invalid(selected):
+    print('Could not find layer {sel}'.format(
+        sel=selected,
+    ))
+    print('')
 
 
 def show_details(packet):
@@ -119,6 +138,17 @@ def show_pdf(packet):
     os.rmdir(tempdir)
 
 
+def get_packet_layer_names(packet):
+    layer_names = []
+    depth = 0
+    while True:
+        try:
+            layer_names.append(packet[depth].name)
+            depth += 1
+        except IndexError:
+            return layer_names
+
+
 DISPLAYS = {
     'details': show_details,
     'summary': show_summary,
@@ -128,34 +158,33 @@ DISPLAYS = {
 
 
 if __name__ == '__main__':
+    packet = make_packet()
+
     parser = argparse.ArgumentParser(
         description='Display packets in... ways.',
     )
 
     parser.add_argument(
-        '-f', '--filter',
-        help='Packet displays to show. Allowed {displays}'.format(
-            displays=', '.join(DISPLAYS.keys()),
-        ),
+        '-f', '--filters',
+        help='Packet displays to show.',
         nargs='+',
+        choices=DISPLAYS.keys(),
+    )
+
+    parser.add_argument(
+        '-l', '--layers',
+        help="Get only specified layers.",
+        nargs='+',
+        choices=get_packet_layer_names(packet),
     )
 
     args = parser.parse_args()
 
-    filters = args.filter
-    if filters is not None:
-        invalid = []
-        for display_filter in filters:
-            if display_filter not in DISPLAYS.keys():
-                invalid.append(display_filter)
-        if invalid:
-            stderr.write(
-                'Invalid filters specified: {invalid}\n'
-                'Valid filters are: {valid}\n'.format(
-                    invalid=', '.join(invalid),
-                    valid=', '.join(DISPLAYS.keys()),
-                )
-            )
-            exit(1)
+    filters = args.filters
+    layers = args.layers
 
-    display(make_packet(), filters=filters)
+    if layers:
+        for layer in layers:
+            display(packet, filters=filters, layer=layer)
+    else:
+        display(packet, filters=filters)
