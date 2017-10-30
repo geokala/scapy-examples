@@ -12,3 +12,7 @@ OSX:
 Ubuntu (and debian?):
   Prerequisites:
     - apt-get install python-pyx  # Only for displaying pdfs
+
+Windows:
+  Prerequisites:
+    - Ensure windows prereqs for scapy are installed: http://scapy.readthedocs.io/en/latest/installation.html#windows
