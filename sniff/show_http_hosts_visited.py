@@ -139,14 +139,13 @@ def get_http_host_name(packet):
     # Very naive retriever
     hostname = None
     if packet.haslayer('Raw'):
-        if sys.version[0] == '3':
-            raw_packet = str(packet.getlayer('Raw').load, 'ascii')
-        else:
-            raw_packet = packet.getlayer('Raw').load
-        fields = raw_packet.split('\r\n')
+        raw_packet = packet.getlayer('Raw').load
+        fields = raw_packet.split(b'\r\n')
         for field in fields:
-            if field.startswith('Host: '):
+            if field.startswith(b'Host: '):
                 hostname = field[6:].strip()
+        if sys.version[0] == '3':
+            hostname = str(hostname, 'ascii')
     return hostname
 
 
