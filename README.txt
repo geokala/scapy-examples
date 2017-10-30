@@ -1,7 +1,8 @@
 General:
   - pip install .
-  - 'show' should work without root.
-  - 'sniff' will require running as root. Sorry.
+  - 'show' examples should work without root.
+  - 'sniff' examples will require running as root. Sorry.
+  - 'do' examples will require running as root. Don't worry, learn to accept hardship.
 
 OSX:
   Prerequisites:
