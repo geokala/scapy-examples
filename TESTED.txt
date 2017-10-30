@@ -5,3 +5,4 @@
   - Ubuntu 16.04, pypy3 (beta): Show working works; UTF encoding error on sniff (unknown cause)
   - OSX 10.11.6, python3: Scapy not working, pdf issues (may be solved, see README), sniff working
   - OSX 10.11.6, python2: Scapy not working- pcapy issue (dependencies of scapy not installing)
+  - Windows 10, python2: Scapy not working- wpcap.dll issue even after install of npcap. Conda related problem?
