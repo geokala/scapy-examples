@@ -16,6 +16,11 @@ import tempfile
 # up losing a lot of the usefulness.
 import scapy.all as scapy
 
+try:
+    input = raw_input
+except NameError:
+    pass
+
 
 def make_packet():
     """
@@ -134,6 +139,7 @@ def show_pdf(packet):
             shell=True,
         )
 
+    input('Press enter when you have finished viewing the PDF...')
     os.unlink(dumpfile)
     os.rmdir(tempdir)
 
