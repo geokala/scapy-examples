@@ -3,7 +3,7 @@ from sys import version
 
 
 requirements = [
-    'click',
+    'netifaces',
 ]
 if int(version[0]) == 3:
     requirements.append('scapy-python3')
@@ -14,6 +14,6 @@ else:
 
 setup(
     name="scapy_examples",
-    version="0.4.0",
+    version="0.4.1",
     install_requires=requirements,
 )

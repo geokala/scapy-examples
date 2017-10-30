@@ -9,7 +9,7 @@ from __future__ import print_function
 import argparse
 import os
 import subprocess
-from sys import platform
+from sys import platform, stderr
 import tempfile
 
 # If we don't get all of scapy, packet types are not identified and we end
@@ -123,25 +123,32 @@ def show_command(packet):
 
 def show_pdf(packet):
     print('Creating and displaying PDF dissection of packet...')
-    tempdir = tempfile.mkdtemp()
-    dumpfile = os.path.join(tempdir, 'pingpacket')
-    packet.psdump(dumpfile)
-    # This actually dumps with an eps extension
-    dumpfile = dumpfile + '.eps'
+    generated = False
+    try:
+        tempdir = tempfile.mkdtemp()
+        dumpfile = os.path.join(tempdir, 'pingpacket')
+        packet.psdump(dumpfile)
+        generated = True
+        # This actually dumps with an eps extension
+        dumpfile = dumpfile + '.eps'
 
-    if 'linux' in platform:
-        subprocess.check_call(['xdg-open', dumpfile])
-    elif platform == 'darwin':
-        subprocess.check_call(['open', dumpfile])
-    elif platform == 'win32':
-        subprocess.check_call(
-            'start {dumpfile}'.format(dumpfile=dumpfile),
-            shell=True,
-        )
-
-    input('Press enter when you have finished viewing the PDF...')
-    os.unlink(dumpfile)
-    os.rmdir(tempdir)
+        if 'linux' in platform:
+            subprocess.check_call(['xdg-open', dumpfile])
+        elif platform == 'darwin':
+            subprocess.check_call(['open', dumpfile])
+        elif platform == 'win32':
+            subprocess.check_call(
+                'start {dumpfile}'.format(dumpfile=dumpfile),
+                shell=True,
+            )
+    except Exception:
+        # PDF generation and reading is somewhat flaky. Cope.
+        stderr.write('PDF generation/reading problem. Sorry.\n')
+    finally:
+        if generated:
+            input('Press enter when you have finished viewing the PDF...')
+            os.unlink(dumpfile)
+        os.rmdir(tempdir)
 
 
 def get_packet_layer_names(packet):
