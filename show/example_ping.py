@@ -113,6 +113,10 @@ def show_details(packet):
     packet.show()
 
 
+def show_fields(packet):
+    print(packet.fields)
+
+
 def show_summary(packet):
     print(packet.summary())
 
@@ -167,6 +171,7 @@ DISPLAYS = {
     'summary': show_summary,
     'creation_code': show_command,
     'pdf': show_pdf,
+    'fields': show_fields,
 }
 
 
