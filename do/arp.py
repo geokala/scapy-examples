@@ -2,7 +2,7 @@
 # scapy.all is generated dynamically, stop pylint complaining.
 # pylint: disable=E1101
 """
-    Example of various ways to display a packet in scapy.
+    Example of generating an ARP request and response with scapy.
 """
 from __future__ import print_function
 
@@ -66,9 +66,7 @@ def arp_query(destination, interface):
         print(err)
         raise
 
-    if result:
-        print(result.summary())
-    else:
+    if not result:
         stderr.write(
             'Could not retrieve MAC for IP {ip} on interface '
             '{interface}\n'.format(
@@ -76,12 +74,13 @@ def arp_query(destination, interface):
                 interface=interface,
             )
         )
-        exit(1)
+        result = None
+    return result
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Perform an ARP.',
+        description='Perform an ARP query.',
     )
 
     parser.add_argument(
@@ -99,7 +98,14 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    arp_query(
+    result = arp_query(
         destination=args.destination,
         interface=args.interface,
     )
+    if result is None:
+        stderr.write(
+            'Failed to get result.\n'
+        )
+        exit(1)
+    else:
+        print(result.summary())
