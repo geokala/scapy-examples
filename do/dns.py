@@ -100,7 +100,7 @@ def make_dns_query(qname, qtype, resolver_ip, src_ip,
     return ether / ip / udp / dns/ query
 
 
-def dns_hostname_query(hostname, resolver_ip):
+def dns_query(hostname, resolver_ip, query_type):
     # This returns (<IP>, <interface>)
     default_gateway_ip, default_gateway_interface = \
         netifaces.gateways()['default'][netifaces.AF_INET]
@@ -119,7 +119,7 @@ def dns_hostname_query(hostname, resolver_ip):
 
     packet = make_dns_query(
         hostname,
-        'A',
+        query_type,
         resolver_ip,
         src_ip=src_ip,
         gateway_mac=default_gateway_arp.hwsrc,
@@ -169,12 +169,18 @@ if __name__ == '__main__':
         help='DNS server (resolver) to use',
         required=True,
     )
+    parser.add_argument(
+        '-q', '--query-type',
+        help='DNS query type',
+        default='A',
+    )
 
     args = parser.parse_args()
 
-    result = dns_hostname_query(
+    result = dns_query(
         hostname=args.hostname,
         resolver_ip=args.resolver_ip,
+        query_type=args.query_type,
     )
 
     if result is None:
@@ -183,4 +189,11 @@ if __name__ == '__main__':
         )
         exit(1)
     else:
-        print(result.summary())
+        dns_data = result.getlayer(scapy.DNS)
+        num_answers = dns_data.fields['ancount']
+        for ans in range(0, num_answers):            
+            answer = dns_data.fields['an'][ans].fields
+            print('Got response ({res_type}): {res}'.format(
+                res_type=scapy.DNSRR.type.i2s[answer['type']],
+                res=answer['rdata'],
+            ))

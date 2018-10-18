@@ -1,3 +1,5 @@
+2018-08-16:
+  - OSX 10.14.beta7, python3.6.4: PDF not working even with mactex; sniff working, keyerror IPv4 on do/dns.py; arp working
 2017-10-30:
   - Ubuntu 14.04, python2: Show working, sniff working, do working
   - Ubuntu 14.04, python3: Show working, sniff working, do working

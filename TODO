@@ -1,6 +1,6 @@
 - Add packet dissection class
-- Finish 'do' DNS section for making DNS queries
 - Add 'do' section for sending from not-your address
 - Add section for how to dig into what different packet types require (scapy.<PACKETTYPE>.fields_desc starting point), e.g. include DNSQR type because it has an enum and strings, maybe MACQuery for shorts, bytes, etc (enum_field_type.s2i)
 - Probably need to use srp1 more, instead of sr1 (for layer2 packets)- see https://stackoverflow.com/questions/18625072/understanding-the-scapy-mac-address-to-reach-destination-not-found-using-broad
-- Improve DNS output
+- Can we suppress IPv6 warning?
+- IPv4 error on OSX: needs 2048 (IP code- where is this looked up?)
