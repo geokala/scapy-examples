@@ -53,7 +53,7 @@ def arp_query(destination, interface):
     packet = make_arp_packet(destination, interface, mac_address)
 
     try:
-        result = scapy.sr1(packet, timeout=2, iface=interface)
+        result = scapy.srp1(packet, timeout=2, iface=interface)
     except socket.error as err:
         if 'No such device' in err:
             stderr.write(

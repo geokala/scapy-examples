@@ -1,3 +1,5 @@
+0.4.3 - Use srp1 to avoid problems with packet generation on ARP.
+0.4.2 - Update scapy version.
 0.4.1 - Add netifaces to requirements, handle PDF problems.
 0.4.0 - Add example 'do' ARP.
 0.3.2 - Make sniff work even with OCSP.
