@@ -21,22 +21,25 @@ def make_arp_packet(destination, interface, mac_address):
     """
         Make a ping packet for example purposes.
     """
+    ether = scapy.Ether(
+        src=mac_address,
+        dst='ff:ff:ff:ff:ff:ff',
+        type='ARP',
+    )
+
     arp = scapy.ARP(
         hwsrc=mac_address,
         hwtype=1,
         op=1,
         hwlen=6,
-        psrc='0.0.0.0',
+        psrc='172.28.172.2',
         plen=4,
-        hwdst='ff:ff:ff:ff:ff:ff',
+        hwdst='00:00:00:00:00:00',
         pdst=destination,
         ptype=2048,
     )
 
-    # Note that the packet.command if you sniff an ARP packet will suggest it
-    # needs an Ether layer, but this is incorrect (and more importantly,
-    # will not work)
-    packet = arp
+    packet = ether / arp
 
     return packet
 
