@@ -19,7 +19,7 @@ import scapy.all as scapy
 
 def make_arp_packet(destination, interface, mac_address):
     """
-        Make a ping packet for example purposes.
+        Make an ARP request.
     """
     ether = scapy.Ether(
         src=mac_address,
