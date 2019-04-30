@@ -13,6 +13,6 @@ else:
 
 setup(
     name="scapy_examples",
-    version="0.4.4",
+    version="0.4.5",
     install_requires=requirements,
 )

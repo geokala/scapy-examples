@@ -37,7 +37,7 @@ def make_packet():
         src='192.0.2.201',
         proto=1,
         tos=0,
-        dst='8.8.8.8',
+        dst='203.0.113.102',
         chksum=22360,
         len=84,
         options=[],
