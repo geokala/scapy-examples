@@ -1,4 +1,4 @@
-0.4.4 - Make arp work agai with new scapy version.
+0.4.4 - Make arp work again with new scapy version.
 0.4.3 - Use srp1 to avoid problems with packet generation on ARP.
 0.4.2 - Update scapy version.
 0.4.1 - Add netifaces to requirements, handle PDF problems.
