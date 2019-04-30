@@ -7,6 +7,7 @@
 from __future__ import print_function
 
 import argparse
+from sys import stderr, exit
 
 import netifaces
 
@@ -169,7 +170,6 @@ if __name__ == '__main__':
         required=True,
         choices=netifaces.interfaces(),
     )
-    # TODO: Check if interface is up, or just make that part of the error message?
 
     args = parser.parse_args()
 
@@ -179,4 +179,12 @@ if __name__ == '__main__':
         interface=args.interface,
     )
 
-    print(response.summary())
+    if response:
+        print(response.summary())
+    else:
+        stderr.write(
+            'No response received. Check that the target server is up and '
+            'responding, and that the network interface you specified is '
+            'correct and not currently down.'
+        )
+        exit(1)
